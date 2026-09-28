@@ -81,6 +81,17 @@ public sealed class KnownRect
 
 public sealed class AppSettings
 {
+    /// <summary>
+    /// Últimas posições conhecidas, trazidas para o referencial do perfil (alinhadas por um
+    /// ecrã que tenha posição nos dois), para se poderem misturar com as posições do perfil.
+    /// </summary>
+    public Dictionary<string, Display.LayoutRect> KnownPositionsFor(Profile profile)
+    {
+        var anchor = profile.Monitors.FirstOrDefault(pm => pm.HasPosition && LastKnown.ContainsKey(pm.Id));
+        var (ox, oy) = anchor is null ? (0, 0) : (anchor.X!.Value - LastKnown[anchor.Id].X, anchor.Y!.Value - LastKnown[anchor.Id].Y);
+        return LastKnown.ToDictionary(kv => kv.Key, kv => new Display.LayoutRect(kv.Value.X + ox, kv.Value.Y + oy, kv.Value.Width, kv.Value.Height));
+    }
+
     public List<Profile> Profiles { get; set; } = [];
     /// <summary>Nomes dados pelo utilizador aos monitores (id → nome).</summary>
     public Dictionary<string, string> Aliases { get; set; } = [];

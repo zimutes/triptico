@@ -136,15 +136,33 @@ public partial class App : Application
             return;
         }
 
+        // As posições conhecidas vivem num referencial único. As do Windows são relativas ao
+        // ecrã principal, que muda de perfil para perfil; por isso a disposição atual é
+        // alinhada com a última posição conhecida de um ecrã que esteja ligado agora.
+        var active = Monitors.Where(m => m.Active).ToList();
+        var anchor = active.FirstOrDefault(m => Settings.LastKnown.ContainsKey(m.Id));
+        var (dx, dy) = anchor is null ? (0, 0) : (Settings.LastKnown[anchor.Id].X - anchor.X, Settings.LastKnown[anchor.Id].Y - anchor.Y);
+
         var changed = false;
-        foreach (var m in Monitors.Where(m => m.Active))
+        foreach (var m in active)
         {
-            if (Settings.LastKnown.TryGetValue(m.Id, out var k) && k.X == m.X && k.Y == m.Y && k.Width == m.Width && k.Height == m.Height)
+            var (x, y) = (m.X + dx, m.Y + dy);
+            if (Settings.LastKnown.TryGetValue(m.Id, out var k) && k.X == x && k.Y == y && k.Width == m.Width && k.Height == m.Height)
                 continue;
-            Settings.LastKnown[m.Id] = new KnownRect { X = m.X, Y = m.Y, Width = m.Width, Height = m.Height };
+            Settings.LastKnown[m.Id] = new KnownRect { X = x, Y = y, Width = m.Width, Height = m.Height };
             changed = true;
         }
         if (changed && save) Save();
+
+        // Numerar pela posição física (da esquerda para a direita), esteja o ecrã ligado ou não;
+        // os que nunca estiveram ligados vão para o fim.
+        Monitors = Monitors
+            .OrderBy(m => Settings.LastKnown.ContainsKey(m.Id) ? 0 : 1)
+            .ThenBy(m => Settings.LastKnown.TryGetValue(m.Id, out var k) ? k.X : 0)
+            .ThenBy(m => Settings.LastKnown.TryGetValue(m.Id, out var k) ? k.Y : 0)
+            .ThenBy(m => m.Connector)
+            .ToList();
+
         StateChanged?.Invoke();
     }
 
@@ -158,9 +176,6 @@ public partial class App : Application
 
     /// <summary>Número do ecrã (1, 2, 3...) na lista "Ecrãs ligados".</summary>
     public int MonitorNumber(MonitorInfo m) => Monitors.IndexOf(m) + 1;
-
-    public LayoutRect? LastKnownRect(string monitorId) =>
-        Settings.LastKnown.TryGetValue(monitorId, out var k) ? new LayoutRect(k.X, k.Y, k.Width, k.Height) : null;
 
     public void Save()
     {
@@ -310,7 +325,7 @@ public partial class App : Application
         try
         {
             var snapshot = profile.Clone();
-            var known = Settings.LastKnown.ToDictionary(kv => kv.Key, kv => new LayoutRect(kv.Value.X, kv.Value.Y, kv.Value.Width, kv.Value.Height));
+            var known = Settings.KnownPositionsFor(profile);
             var result = await Task.Run(() => DisplayManager.Apply(snapshot, id => known.TryGetValue(id, out var r) ? r : null));
             Log.Write($"Perfil «{profile.Name}»: {result.Message}");
 
@@ -393,7 +408,7 @@ internal static class CommandLine
                 return true;
             }
 
-            var known = settings.LastKnown.ToDictionary(kv => kv.Key, kv => new LayoutRect(kv.Value.X, kv.Value.Y, kv.Value.Width, kv.Value.Height));
+            var known = settings.KnownPositionsFor(profile);
             var result = DisplayManager.Apply(profile, id => known.TryGetValue(id, out var r) ? r : null, validateOnly: cmd == "--testar");
             Console.WriteLine($"{profile.Name}: {result.Message}" + (result.Missing.Count > 0 ? " Em falta: " + string.Join(", ", result.Missing) : ""));
             exitCode = result.Success ? 0 : 1;

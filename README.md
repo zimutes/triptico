@@ -15,6 +15,10 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/zimutes/triptico/actions/workflows/compilar.yml"><img src="https://github.com/zimutes/triptico/actions/workflows/compilar.yml/badge.svg" alt="Build"></a>
+</p>
+
+<p align="center">
   <img src="docs/janela-principal.png" width="600" alt="Tríptico main window: four profiles with a miniature of each layout, and the three connected displays">
 </p>
 
@@ -50,8 +54,8 @@ The tools that do this properly tend to be paid, or bury it under a hundred othe
 Tríptico does one thing: **profiles for your displays**, one hotkey each.
 
 ```text
- Home       [ 2 ][ 1 ][ 3 ]     Ctrl + Alt + F1    all three, side by side
- Work            [ 1 ]          Ctrl + Alt + F2    just the one that stays
+ Home       [ 1 ][ 2 ][ 3 ]     Ctrl + Alt + F1    all three, side by side
+ Work            [ 2 ]          Ctrl + Alt + F2    just the one that stays
  Movie                [ 3 ]     Ctrl + Alt + F3    only the big screen
 ```
 
@@ -66,7 +70,8 @@ Tríptico does one thing: **profiles for your displays**, one hotkey each.
   about combinations that would break typing: on many European layouts Ctrl + Alt *is*
   AltGr, so Ctrl + Alt + 2 would cost you the `@`.
 - **Tray menu** listing your profiles, with the active one ticked.
-- **Identify displays** puts a large number on every screen for three seconds.
+- **Identify displays** puts a large number on every screen for three seconds. Displays are
+  numbered left to right as they sit on your desk, whether they're on or off right now.
 - **Your own names** for displays ("Left", "Laptop"…), used everywhere in the app.
 - **Command line**, for desktop shortcuts, Stream Deck buttons or scripts.
 - **Starts with Windows** if you want it to. No administrator rights needed, ever.
@@ -99,11 +104,19 @@ the monitor's EDID.
 
 ## Install
 
-**Requirements:** Windows 10 or 11 (x64) and the
-[.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0). Or build the
-self-contained version below and install nothing else.
+**Requirements:** Windows 10 or 11 (x64).
 
-Clone the repository and run, from PowerShell:
+**Download** from [Releases](https://github.com/zimutes/triptico/releases) when one is
+published:
+
+- `Triptico.exe` is small but needs the
+  [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+- `Triptico-autonomo-win-x64.zip` is self-contained and runs with nothing else installed.
+
+Each release is built by [GitHub Actions](.github/workflows/publicar.yml) from the tagged
+source and comes with `SHA256SUMS`.
+
+**Or build and install from source.** Clone the repository and run, from PowerShell:
 
 ```powershell
 .\tools\publicar.ps1              # builds one .exe and installs it for the current user
@@ -114,6 +127,17 @@ Clone the repository and run, from PowerShell:
 It installs to `%LOCALAPPDATA%\Programs\Triptico` and adds **Tríptico** to the Start menu.
 No administrator rights needed. The executable is unsigned, so Windows SmartScreen may ask
 first: *More info → Run anyway*.
+
+### Uninstall
+
+```powershell
+.\tools\desinstalar.ps1           # closes the app, removes the files, shortcut and autostart
+.\tools\desinstalar.ps1 -Tudo     # …and your profiles too
+.\tools\desinstalar.ps1 -WhatIf   # show what it would remove, delete nothing
+```
+
+Profiles stay in `%APPDATA%\Triptico` unless you pass `-Tudo`, so a reinstall finds them
+again.
 
 ## Using it
 
@@ -170,7 +194,11 @@ src/Triptico/
   Views/      WPF windows (Fluent theme, follows Windows light/dark)
 tools/
   publicar.ps1      build and install
+  desinstalar.ps1   remove it again
   gerar-icone.ps1   regenerate the icon
+.github/workflows/
+  compilar.yml      build check on every push
+  publicar.yml      release on every v* tag (git tag v1.0.0 && git push origin v1.0.0)
 ```
 
 **Please don't apply real profiles while testing.** It rearranges your actual screens.
