@@ -15,6 +15,16 @@ public static class SettingsStore
 
     public static readonly string FilePath = Path.Combine(Folder, "definicoes.json");
 
+    /// <summary>
+    /// Identifica a pasta de dados, para que uma cópia com outra pasta (TRIPTICO_DADOS)
+    /// possa correr ao mesmo tempo que a instalada.
+    /// </summary>
+    public static string InstanceSuffix =>
+        Environment.GetEnvironmentVariable("TRIPTICO_DADOS") is { Length: > 0 }
+            ? "-" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+                System.Text.Encoding.UTF8.GetBytes(Path.GetFullPath(Folder).ToLowerInvariant())))[..12]
+            : "";
+
     private static readonly JsonSerializerOptions Options = new()
     {
         WriteIndented = true,
