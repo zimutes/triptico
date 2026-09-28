@@ -15,6 +15,10 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/zimutes/triptico/actions/workflows/compilar.yml"><img src="https://github.com/zimutes/triptico/actions/workflows/compilar.yml/badge.svg" alt="Compilação"></a>
+</p>
+
+<p align="center">
   <img src="docs/janela-principal.png" width="600" alt="Janela principal do Tríptico">
 </p>
 
@@ -47,8 +51,8 @@ As ferramentas que fazem isto bem costumam ser pagas ou esconder a função no m
 O Tríptico faz uma coisa só: **perfis de ecrãs**, um atalho para cada um.
 
 ```text
- Casa       [ 2 ][ 1 ][ 3 ]     Ctrl + Alt + F1    os três lado a lado
- Trabalho        [ 1 ]          Ctrl + Alt + F2    só o que fica
+ Casa       [ 1 ][ 2 ][ 3 ]     Ctrl + Alt + F1    os três lado a lado
+ Trabalho        [ 2 ]          Ctrl + Alt + F2    só o que fica
  Cinema               [ 3 ]     Ctrl + Alt + F3    só o ecrã grande
 ```
 
@@ -63,7 +67,8 @@ O Tríptico faz uma coisa só: **perfis de ecrãs**, um atalho para cada um.
   estragaria a escrita: no teclado português, Ctrl + Alt *é* o AltGr, e Ctrl + Alt + 2
   levava-lhe o `@`.
 - **Menu na bandeja** com os perfis e o ativo assinalado.
-- **Identificar ecrãs**: um número grande em cada monitor durante três segundos.
+- **Identificar ecrãs**: um número grande em cada monitor durante três segundos. Os ecrãs são
+  numerados da esquerda para a direita, como estão na secretária, ligados ou não.
 - **Nomes próprios** para os ecrãs («Esquerda», «Portátil»…).
 - **Linha de comandos**, para atalhos no ambiente de trabalho, Stream Deck ou scripts.
 - **Arranque com o Windows**, opcional e sem precisar de administrador.
@@ -91,9 +96,19 @@ monitor.
 
 ## Instalar
 
-**Requisitos:** Windows 10 ou 11 (x64) e o
-[.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0), ou a versão
-autónoma, que não precisa de mais nada.
+**Requisitos:** Windows 10 ou 11 (x64).
+
+**Descarregar** das [Releases](https://github.com/zimutes/triptico/releases), quando houver
+uma publicada:
+
+- `Triptico.exe` é pequeno, mas precisa do
+  [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+- `Triptico-autonomo-win-x64.zip` é autónomo e corre sem instalar mais nada.
+
+Cada versão é compilada pelas [GitHub Actions](.github/workflows/publicar.yml) a partir do
+código etiquetado e vem com `SHA256SUMS`.
+
+**Ou compilar e instalar a partir do código:**
 
 ```powershell
 .\tools\publicar.ps1              # compila um .exe e instala-o para o utilizador atual
@@ -104,6 +119,17 @@ autónoma, que não precisa de mais nada.
 Fica em `%LOCALAPPDATA%\Programs\Triptico`, com **Tríptico** no menu Iniciar. O executável não
 está assinado, por isso o SmartScreen pode perguntar primeiro: *Mais informações → Executar mesmo
 assim*.
+
+### Desinstalar
+
+```powershell
+.\tools\desinstalar.ps1           # fecha a app, apaga os ficheiros, o atalho e o arranque automático
+.\tools\desinstalar.ps1 -Tudo     # …e também os perfis
+.\tools\desinstalar.ps1 -WhatIf   # mostra o que apagaria, sem apagar nada
+```
+
+Os perfis ficam em `%APPDATA%\Triptico`, a não ser que use `-Tudo`, para uma reinstalação os
+voltar a encontrar.
 
 ## Usar
 
@@ -148,6 +174,9 @@ portátil, testes), e uma cópia com pasta própria corre ao lado da instalada.
 dotnet build src/Triptico
 dotnet run --project src/Triptico -- --listar
 ```
+
+As GitHub Actions compilam a cada push (`compilar.yml`) e publicam uma Release a cada etiqueta
+`v*` (`publicar.yml`): `git tag v1.0.0 && git push origin v1.0.0`.
 
 **Não aplique perfis a sério durante testes**, porque mexe nos seus ecrãs. Use `--testar` com
 `TRIPTICO_DADOS` a apontar para uma pasta de testes.

@@ -11,7 +11,13 @@ Marca "by zimutek". Tudo em português de Portugal (interface, comentários, com
 - `src/Triptico/Services/` — atalhos globais, ícone da bandeja (WinForms `NotifyIcon`), arranque com o Windows.
 - `src/Triptico/Views/` — janelas WPF com o tema Fluent (`ThemeMode="System"`).
 - `tools/publicar.ps1` — publica um único `.exe` e instala em `%LOCALAPPDATA%\Programs\Triptico`.
+- `tools/desinstalar.ps1` — remove a instalação (`-Tudo` apaga também os perfis, `-WhatIf` simula).
 - `tools/gerar-icone.ps1` — gera `Assets/triptico.ico`.
+- `.github/workflows/` — `compilar.yml` (cada push, avisos contam como erros) e `publicar.yml`
+  (Release com o .exe leve e o autónomo a cada etiqueta `v*`).
+- Os `.ps1` levam BOM UTF-8: o PowerShell 5.1 lê sem BOM como ANSI e estraga os acentos.
+- As posições conhecidas (`LastKnown`) estão num referencial único, alinhado pelo ecrã que está
+  ligado; a numeração dos ecrãs segue essa posição (esquerda → direita).
 
 ## Regras
 

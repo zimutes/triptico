@@ -66,12 +66,13 @@ public sealed class LayoutPreview : FrameworkElement
     public static IReadOnlyList<PreviewItem> For(Profiles.Profile profile, App app)
     {
         var map = DisplayManager.Resolve(profile.Monitors, app.Monitors);
+        var known = app.Settings.KnownPositionsFor(profile);
         var rects = new List<(LayoutRect Rect, Profiles.ProfileMonitor Pm)>();
         foreach (var pm in profile.Monitors)
         {
             LayoutRect? rect = pm.HasPosition
                 ? new LayoutRect(pm.X!.Value, pm.Y!.Value, pm.Width ?? 1920, pm.Height ?? 1080)
-                : app.LastKnownRect(pm.Id);
+                : known.TryGetValue(pm.Id, out var k) ? k : null;
             if (rect is null && map.TryGetValue(pm, out var live) && live.Active) rect = live.Bounds;
             if (rect is { } r) rects.Add((r, pm));
         }
