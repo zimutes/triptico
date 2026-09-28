@@ -31,12 +31,15 @@
 >
 > **Testado numa secretária.** Foi feita para a montagem do autor, com três monitores, uma placa
 > gráfica, dois ecrãs DisplayPort e um HDMI. A deteção, a edição de perfis, os atalhos e a bandeja
-> foram testados aí. Todos os tipos de mudança de perfil foram verificados com o ensaio do próprio
-> Windows (`SDC_VALIDATE`), que diz se o Windows aceitaria a mudança sem a fazer. Outras placas,
-> portáteis, docks e ligações em cadeia não foram testados.
+> foram testados aí, e voltar a ligar todos os ecrãs foi feito a sério. Os outros tipos de mudança
+> foram verificados com o ensaio do próprio Windows (`SDC_VALIDATE`), que diz se o Windows
+> aceitaria a mudança sem a fazer. Outras placas, portáteis, docks e ligações em cadeia não foram
+> testados.
 >
-> **Se algum ecrã ficar sem imagem:** <kbd>Win</kbd> + <kbd>P</kbd> → *Expandir* volta sempre a
-> ligar todos. Sem garantia de qualquer tipo, ver a [LICENSE](LICENSE).
+> **Se algum ecrã ficar sem imagem:** botão direito no ícone da bandeja → *Ligar todos os ecrãs*.
+> Está lá mesmo antes de criar perfis. <kbd>Win</kbd> + <kbd>P</kbd> → *Expandir* também ajuda,
+> mas repõe a última combinação de ecrãs que o Windows guardou, que nem sempre são todos. Sem
+> garantia de qualquer tipo, ver a [LICENSE](LICENSE).
 
 ---
 
@@ -66,7 +69,9 @@ O Tríptico faz uma coisa só: **perfis de ecrãs**, um atalho para cada um.
 - **Atalhos globais**, que funcionam com a janela fechada. O editor avisa quando um atalho
   estragaria a escrita: no teclado português, Ctrl + Alt *é* o AltGr, e Ctrl + Alt + 2
   levava-lhe o `@`.
-- **Menu na bandeja** com os perfis e o ativo assinalado.
+- **Ligar ou desligar um ecrã** diretamente na lista, ou **todos de uma vez**, sem precisar
+  de perfis.
+- **Menu na bandeja** com os perfis, o ativo assinalado e *Ligar todos os ecrãs*.
 - **Identificar ecrãs**: um número grande em cada monitor durante três segundos. Os ecrãs são
   numerados da esquerda para a direita, como estão na secretária, ligados ou não.
 - **Nomes próprios** para os ecrãs («Esquerda», «Portátil»…).
@@ -134,7 +139,9 @@ voltar a encontrar.
 ## Usar
 
 1. Abra o **Tríptico** no menu Iniciar.
-2. Clique em **Criar perfis sugeridos**, ou arrume os ecrãs no Windows como gosta e clique em
+   Para mudar um ecrã já, use **Ligar** / **Desligar** ao lado dele, ou **Ligar todos**.
+2. Para ter atalhos, ligue primeiro os ecrãs que usa em casa e clique em **Criar perfis
+   sugeridos**: essa disposição fica como «todos os ecrãs». Ou arrume os ecrãs como gosta e clique em
    **Guardar disposição atual**.
 3. Em **Editar**, mude o nome, marque os ecrãs que ficam ligados, escolha o principal e grave um
    atalho.
@@ -147,6 +154,7 @@ voltar a encontrar.
 Triptico.exe --perfil "Trabalho"   aplica o perfil e sai
 Triptico.exe --listar              mostra ecrãs e perfis
 Triptico.exe --testar "Trabalho"   pergunta ao Windows se aceitaria o perfil, sem mudar nada
+Triptico.exe --ligar-todos         liga todos os ecrãs ligados ao PC
 Triptico.exe --bandeja             arranca escondido na bandeja
 ```
 

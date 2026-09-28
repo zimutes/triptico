@@ -315,13 +315,52 @@ public partial class App : Application
         if (p is not null) _ = ApplyProfileAsync(p);
     }
 
+    // ------------------------------------------------------------ ligar e desligar ecrãs
+
+    public bool AnyMonitorOff => Monitors.Any(m => !m.Active);
+
+    /// <summary>Liga ou desliga um ecrã, mantendo os outros como estão (não precisa de perfis).</summary>
+    public Task SetMonitorAsync(MonitorInfo monitor, bool on)
+    {
+        RefreshMonitors();
+        var profile = DisplayManager.Capture("", Monitors);
+        var target = profile.Monitors.FirstOrDefault(m => m.Id == monitor.Id);
+        if (target is null || target.Enabled == on) return Task.CompletedTask;
+        if (!on && profile.Monitors.Count(m => m.Enabled) <= 1)
+        {
+            _tray?.Notify("Não dá para desligar", "É o único ecrã ligado.", error: true);
+            return Task.CompletedTask;
+        }
+
+        target.Enabled = on;
+        if (!on && target.Primary)
+        {
+            target.Primary = false;
+            profile.Monitors.First(m => m.Enabled).Primary = true;
+        }
+        profile.Name = $"{MonitorName(monitor)} {(on ? "ligado" : "desligado")}";
+        return ApplyProfileAsync(profile, profile.Name);
+    }
+
+    /// <summary>Liga todos os ecrãs ligados ao PC; o principal fica o mesmo.</summary>
+    public Task EnableAllAsync()
+    {
+        RefreshMonitors();
+        var profile = DisplayManager.Capture("Todos os ecrãs ligados", Monitors);
+        foreach (var m in profile.Monitors) m.Enabled = true;
+        return ApplyProfileAsync(profile, profile.Name);
+    }
+
     // ------------------------------------------------------------ aplicar
 
-    public async Task ApplyProfileAsync(Profile profile)
+    /// <param name="doneTitle">Título do aviso quando não é um perfil guardado (ex.: «ASUS ligado»).</param>
+    public async Task ApplyProfileAsync(Profile profile, string? doneTitle = null)
     {
         if (IsApplying) return;
         IsApplying = true;
         StateChanged?.Invoke();
+        var okTitle = doneTitle ?? $"«{profile.Name}» aplicado";
+        var failTitle = doneTitle is null ? $"Não deu para aplicar «{profile.Name}»" : "Não deu para mudar os ecrãs";
         try
         {
             var snapshot = profile.Clone();
@@ -332,7 +371,7 @@ public partial class App : Application
             RefreshMonitors();
             if (!result.Success)
             {
-                _tray?.Notify($"Não deu para aplicar «{profile.Name}»", result.Message, error: true);
+                _tray?.Notify(failTitle, result.Message, error: true);
                 return;
             }
 
@@ -346,14 +385,14 @@ public partial class App : Application
             Save();
 
             if (result.Missing.Count > 0)
-                _tray?.Notify($"«{profile.Name}» aplicado", "Não encontrei: " + string.Join(", ", result.Missing));
+                _tray?.Notify(okTitle, "Não encontrei: " + string.Join(", ", result.Missing));
             else if (Settings.ShowNotifications)
-                _tray?.Notify($"«{profile.Name}» aplicado", "");
+                _tray?.Notify(okTitle, "");
         }
         catch (Exception ex)
         {
             Log.Write("Erro a aplicar: " + ex);
-            _tray?.Notify($"Não deu para aplicar «{profile.Name}»", ex.Message, error: true);
+            _tray?.Notify(failTitle, ex.Message, error: true);
         }
         finally
         {
@@ -368,6 +407,7 @@ public partial class App : Application
 ///   Triptico.exe --perfil "Trabalho"   aplica e sai
 ///   Triptico.exe --listar              mostra ecrãs e perfis
 ///   Triptico.exe --testar "Trabalho"   pergunta ao Windows se aceitaria, sem mudar nada
+///   Triptico.exe --ligar-todos         liga todos os ecrãs ligados ao PC
 /// </summary>
 internal static class CommandLine
 {
@@ -375,7 +415,7 @@ internal static class CommandLine
     {
         exitCode = 0;
         var cmd = args.FirstOrDefault()?.ToLowerInvariant();
-        if (cmd is not ("--perfil" or "--listar" or "--testar")) return false;
+        if (cmd is not ("--perfil" or "--listar" or "--testar" or "--ligar-todos")) return false;
 
         AttachConsole(-1);
         Console.WriteLine();
@@ -399,11 +439,20 @@ internal static class CommandLine
                 return true;
             }
 
-            var name = string.Join(' ', args.Skip(1));
-            var profile = settings.Profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase));
+            Profile? profile;
+            if (cmd == "--ligar-todos")
+            {
+                profile = DisplayManager.Capture("Todos os ecrãs", DisplayManager.GetMonitors());
+                foreach (var m in profile.Monitors) m.Enabled = true;
+            }
+            else
+            {
+                var name = string.Join(' ', args.Skip(1));
+                profile = settings.Profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase));
+            }
             if (profile is null)
             {
-                Console.WriteLine($"Perfil «{name}» não existe.");
+                Console.WriteLine($"Perfil «{string.Join(' ', args.Skip(1))}» não existe.");
                 exitCode = 2;
                 return true;
             }

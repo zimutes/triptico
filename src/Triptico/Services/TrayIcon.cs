@@ -61,6 +61,10 @@ internal sealed class TrayIcon : IDisposable
         }
 
         _menu.Items.Add(new WinForms.ToolStripSeparator());
+        // Sempre presente, mesmo sem perfis: é a saída de emergência.
+        var all = new WinForms.ToolStripMenuItem("Ligar todos os ecrãs") { Enabled = _app.AnyMonitorOff && !_app.IsApplying };
+        all.Click += (_, _) => _ = _app.EnableAllAsync();
+        _menu.Items.Add(all);
         _menu.Items.Add("Abrir o Tríptico", null, (_, _) => _app.ShowMain());
         _menu.Items.Add("Identificar ecrãs", null, (_, _) => IdentifyOverlay.ShowAll());
         _menu.Items.Add(new WinForms.ToolStripSeparator());

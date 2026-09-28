@@ -36,9 +36,10 @@
                 <StackPanel>
                     <TextBlock Text="Ainda não há perfis" FontSize="16" FontWeight="SemiBold" />
                     <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,14">
-                        Um perfil guarda que ecrãs ficam ligados e onde fica cada um.
+                        Um perfil guarda que ecrãs ficam ligados e onde fica cada um, para trocar com um atalho.
                         Crie os sugeridos (todos os ecrãs + um só com cada ecrã) ou arrume os ecrãs
                         no Windows como gosta e clique em «Guardar disposição atual».
+                        Para ligar ou desligar um ecrã já, use os botões na lista em baixo.
                     </TextBlock>
                     <Button Content="Criar perfis sugeridos" Click="Suggested_Click" HorizontalAlignment="Left"
                             Style="{DynamicResource AccentButtonStyle}" Padding="14,6" />
@@ -111,6 +112,8 @@
             <!-- Ecrãs -->
             <DockPanel Margin="0,20,0,12">
                 <Button DockPanel.Dock="Right" Content="Identificar ecrãs" Click="Identify_Click" Padding="14,6" />
+                <Button x:Name="EnableAllButton" DockPanel.Dock="Right" Content="Ligar todos" Click="EnableAll_Click"
+                        Padding="14,6" Margin="0,0,8,0" Style="{DynamicResource AccentButtonStyle}" />
                 <TextBlock Text="Ecrãs ligados ao PC" Style="{StaticResource SectionTitle}" />
             </DockPanel>
 
@@ -126,7 +129,15 @@
                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
                                 <Button DockPanel.Dock="Right" Content="Mudar nome" Click="Rename_Click" Tag="{Binding}"
-                                        Padding="10,4" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                        Padding="10,4" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                <Button DockPanel.Dock="Right" Content="Ligar" Click="TurnOn_Click" Tag="{Binding}"
+                                        Padding="14,4" MinWidth="84" VerticalAlignment="Center" Margin="12,0,0,0"
+                                        Visibility="{Binding OffVisibility}" IsEnabled="{Binding CanToggle}"
+                                        Style="{DynamicResource AccentButtonStyle}" />
+                                <Button DockPanel.Dock="Right" Content="Desligar" Click="TurnOff_Click" Tag="{Binding}"
+                                        Padding="14,4" MinWidth="84" VerticalAlignment="Center" Margin="12,0,0,0"
+                                        Visibility="{Binding OnVisibility}" IsEnabled="{Binding CanTurnOff}"
+                                        ToolTip="Desliga este ecrã no Windows; os outros ficam como estão." />
                                 <TextBlock DockPanel.Dock="Right" Text="{Binding State}" VerticalAlignment="Center"
                                            Style="{StaticResource Muted}" />
                                 <StackPanel VerticalAlignment="Center">
@@ -154,7 +165,8 @@
                           Checked="Notify_Changed" Unchecked="Notify_Changed" />
             </WrapPanel>
             <TextBlock Style="{StaticResource Muted}" FontSize="12" Margin="0,12,0,0">
-                Se algum dia ficar sem imagem, <Run FontWeight="SemiBold" Text="Win + P" /> → «Expandir» volta a ligar todos os ecrãs.
+                Se um ecrã ficar sem imagem, use «Ligar todos os ecrãs» no ícone da bandeja
+                (ou <Run FontWeight="SemiBold" Text="Win + P" /> → «Expandir»).
                 Fechar esta janela deixa o Tríptico na bandeja, ao pé do relógio.
             </TextBlock>
         </StackPanel>
