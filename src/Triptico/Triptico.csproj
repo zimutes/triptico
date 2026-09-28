@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>Triptico</AssemblyName>
+    <RootNamespace>Triptico</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\triptico.ico</ApplicationIcon>
+    <!-- O tema Fluent do WPF ainda está marcado como experimental. -->
+    <!-- WFO0003: o DPI é declarado no manifesto de propósito (a app é WPF, não WinForms). -->
+    <NoWarn>$(NoWarn);WPF0001;WFO0003</NoWarn>
+
+    <Version>1.0.0</Version>
+    <Product>Tríptico</Product>
+    <Company>zimutek</Company>
+    <Authors>zimutek</Authors>
+    <Copyright>© zimutek</Copyright>
+    <Description>Perfis de ecrãs para Windows: liga e desliga monitores num clique.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF e WinForms juntos: evitar ambiguidades (Application, MessageBox, Brush...). -->
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\triptico.ico" />
+  </ItemGroup>
+
+</Project>
