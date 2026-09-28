@@ -1,0 +1,21 @@
+# Confirma que o projeto compila em cada push e em cada pull request.
+
+name: Compilar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  compilar:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Compilar
+        run: dotnet build src/Triptico -c Release -warnaserror
