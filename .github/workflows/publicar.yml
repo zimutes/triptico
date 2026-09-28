@@ -1,0 +1,76 @@
+# Compila e publica os executáveis de uma versão.
+#
+# Dispara numa etiqueta "v*" (git tag v1.0.0 && git push origin v1.0.0), ou à mão pelo
+# separador Actions. Os binários nunca entram no repositório: são construídos aqui e
+# anexados à release.
+
+name: Publicar versão
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      etiqueta:
+        description: "Etiqueta a publicar (ex.: v1.0.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: windows-latest
+    env:
+      ETIQUETA: ${{ github.event.inputs.etiqueta || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.etiqueta || github.ref }}
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      # Duas versões: uma pequena, que usa o .NET 10 Desktop Runtime instalado, e uma
+      # autónoma, que corre em qualquer PC sem instalar nada.
+      - name: Compilar
+        shell: pwsh
+        run: |
+          $versao = $env:ETIQUETA.TrimStart('v')
+          $comum = @('src/Triptico', '-c', 'Release', '-r', 'win-x64', '-p:PublishSingleFile=true',
+                     '-p:DebugType=none', "-p:Version=$versao")
+          dotnet publish @comum --no-self-contained -o saida/leve
+          dotnet publish @comum --self-contained -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true -o saida/autonomo
+
+      - name: Empacotar
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory recolha | Out-Null
+          Copy-Item saida/leve/Triptico.exe recolha/Triptico.exe
+          Compress-Archive -Path saida/autonomo/Triptico.exe -DestinationPath recolha/Triptico-autonomo-win-x64.zip
+          Push-Location recolha
+          Get-ChildItem -File | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_.Name -Algorithm SHA256).Hash.ToLower(), $_.Name
+          } | Set-Content SHA256SUMS -Encoding ascii
+          Get-Content SHA256SUMS
+          Pop-Location
+
+      - name: Criar a release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Aspas simples: o acento grave é o carácter de escape do PowerShell.
+          $notas = @'
+          **Triptico.exe**: needs the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+          **Triptico-autonomo-win-x64.zip**: self-contained, runs on any Windows 10/11 x64 PC with nothing else installed.
+
+          Unsigned: Windows SmartScreen may ask first (*More info → Run anyway*). Checksums in `SHA256SUMS`.
+          '@
+          gh release create $env:ETIQUETA (Get-ChildItem recolha/* | ForEach-Object FullName) `
+            --repo $env:GITHUB_REPOSITORY `
+            --title "Tríptico $env:ETIQUETA" `
+            --notes $notas `
+            --generate-notes
