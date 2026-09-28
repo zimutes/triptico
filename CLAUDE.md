@@ -21,6 +21,11 @@ Marca "by zimutek". Tudo em português de Portugal (interface, comentários, com
 
 ## Regras
 
+- **Nunca deixar o utilizador sem forma de ligar ecrãs**: mesmo sem perfis, a lista tem
+  Ligar/Desligar por ecrã e há «Ligar todos» na janela e na bandeja (`--ligar-todos` na linha
+  de comandos). O Win + P → Expandir do Windows NÃO liga todos: repõe a última combinação que
+  guardou (em 28/09 ligou 2 e desligou o 3.º).
+
 - **Não aplicar perfis a sério durante testes**: muda os ecrãs do utilizador (e os monitores podem estar
   a mostrar o PC do trabalho). Para testar, usar `--testar "Perfil"` (SDC_VALIDATE, não muda nada)
   e `TRIPTICO_DADOS=<pasta de testes>` para não mexer nos perfis reais.

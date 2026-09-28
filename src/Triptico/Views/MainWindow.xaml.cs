@@ -29,6 +29,7 @@ public partial class MainWindow : Window
         ProfilesList.ItemsSource = cards;
         EmptyState.Visibility = cards.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         MonitorsList.ItemsSource = _app.Monitors.Select(m => new MonitorRow(m, _app)).ToList();
+        EnableAllButton.IsEnabled = _app.AnyMonitorOff && !_app.IsApplying;
         StartupCheck.IsChecked = StartupRegistration.IsEnabled;
         NotifyCheck.IsChecked = _app.Settings.ShowNotifications;
         _loading = false;
@@ -119,6 +120,18 @@ public partial class MainWindow : Window
 
     private void Identify_Click(object sender, RoutedEventArgs e) => IdentifyOverlay.ShowAll();
 
+    private async void EnableAll_Click(object sender, RoutedEventArgs e) => await _app.EnableAllAsync();
+
+    private async void TurnOn_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is MonitorRow row) await _app.SetMonitorAsync(row.Monitor, on: true);
+    }
+
+    private async void TurnOff_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is MonitorRow row) await _app.SetMonitorAsync(row.Monitor, on: false);
+    }
+
     private void Rename_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is not MonitorRow row) return;
@@ -200,4 +213,10 @@ public sealed class MonitorRow(MonitorInfo monitor, App app)
     }
 
     public string State => !Monitor.Active ? "Desligado" : Monitor.Primary ? "Principal" : "Ligado";
+
+    public Visibility OnVisibility => Monitor.Active ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility OffVisibility => Monitor.Active ? Visibility.Collapsed : Visibility.Visible;
+    public bool CanToggle => !app.IsApplying;
+    /// <summary>O último ecrã ligado não se pode desligar.</summary>
+    public bool CanTurnOff => CanToggle && app.Monitors.Count(m => m.Active) > 1;
 }

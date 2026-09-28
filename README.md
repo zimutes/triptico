@@ -31,14 +31,18 @@
 >
 > **Tested on one desk.** It was built for the author's own three-monitor setup: one GPU,
 > two DisplayPort screens and one HDMI. Detection, profile editing, hotkeys and the tray were
-> tested there, and every kind of profile change was checked with Windows' own dry run
-> (`SDC_VALIDATE`), which tells you whether Windows would accept a change without making it.
-> Other GPUs, laptops, docks and daisy-chains have not been tested.
+> tested there, and turning every display back on was done for real. The other kinds of
+> change were checked with Windows' own dry run (`SDC_VALIDATE`), which tells you whether
+> Windows would accept a change without making it. Other GPUs, laptops, docks and
+> daisy-chains have not been tested.
 >
 > **The interface is in Portuguese** (pt-PT) for now.
 >
-> **If a screen ever stays dark:** press <kbd>Win</kbd> + <kbd>P</kbd> and pick *Extend*. That
-> always brings every display back. No warranty of any kind, see [LICENSE](LICENSE).
+> **If a screen ever stays dark:** right-click the tray icon and pick *Ligar todos os ecrãs*
+> (turn all displays on). It's there even before you create any profile.
+> <kbd>Win</kbd> + <kbd>P</kbd> → *Extend* helps too, but it brings back the last set of
+> displays Windows remembers, which isn't always all of them. No warranty of any kind, see
+> [LICENSE](LICENSE).
 
 ---
 
@@ -69,7 +73,9 @@ Tríptico does one thing: **profiles for your displays**, one hotkey each.
 - **Global hotkeys** that keep working while the window is closed. The editor warns you
   about combinations that would break typing: on many European layouts Ctrl + Alt *is*
   AltGr, so Ctrl + Alt + 2 would cost you the `@`.
-- **Tray menu** listing your profiles, with the active one ticked.
+- **Turn a single display on or off** straight from the list, or **all of them at once**.
+  No profile needed.
+- **Tray menu** listing your profiles, with the active one ticked, plus *turn all displays on*.
 - **Identify displays** puts a large number on every screen for three seconds. Displays are
   numbered left to right as they sit on your desk, whether they're on or off right now.
 - **Your own names** for displays ("Left", "Laptop"…), used everywhere in the app.
@@ -141,9 +147,11 @@ again.
 
 ## Using it
 
-1. Open **Tríptico** from the Start menu.
-2. Click **Criar perfis sugeridos** (*create suggested profiles*), or arrange your screens in
-   Windows the way you like and click **Guardar disposição atual** (*save current layout*).
+1. Open **Tríptico** from the Start menu. To switch a display right away, use **Ligar** /
+   **Desligar** (*on* / *off*) next to it, or **Ligar todos** (*all on*).
+2. For hotkeys, turn on the displays you use at home first, then click **Criar perfis
+   sugeridos** (*create suggested profiles*): it saves that layout as "all screens". Or arrange
+   your screens the way you like and click **Guardar disposição atual** (*save current layout*).
 3. **Editar** (*edit*) a profile to rename it, tick the displays that stay on, pick the
    primary and record a hotkey.
 4. Close the window. Tríptico stays in the tray, next to the clock, and the hotkeys keep
@@ -155,6 +163,7 @@ again.
 Triptico.exe --perfil "Trabalho"   apply a profile and exit
 Triptico.exe --listar              list displays and profiles
 Triptico.exe --testar "Trabalho"   ask Windows whether it would accept the profile, change nothing
+Triptico.exe --ligar-todos         turn every connected display on
 Triptico.exe --bandeja             start hidden in the tray
 ```
 
