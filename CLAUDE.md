@@ -23,3 +23,7 @@ Marca "by zimutek". Tudo em português de Portugal (interface, comentários, com
 - Atalhos por omissão com Ctrl + Alt + F-teclas: Ctrl + Alt + letra/número é AltGr no teclado PT
   e bloquearia @, €, {…
 - Publicar com `--no-self-contained` (o `--self-contained false` do .NET 10 dá um exe de 165 MB).
+- Repositório **público** (github.com/zimutes/triptico): nada de dados pessoais nem caminhos de
+  dispositivo reais; commits com o email noreply do GitHub (já configurado no repo).
+- `README.md` em inglês e `LEIAME.md` em português: manter os dois em sincronia. As capturas em
+  `docs/` fazem-se com dados de demonstração (`TRIPTICO_DADOS`), nunca com os perfis reais.

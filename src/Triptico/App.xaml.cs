@@ -46,8 +46,9 @@ public partial class App : Application
             return;
         }
 
-        _singleInstance = new Mutex(true, @"Local\Triptico-zimutek", out var isFirst);
-        _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\Triptico-zimutek-mostrar");
+        var instance = @"Local\Triptico-zimutek" + SettingsStore.InstanceSuffix;
+        _singleInstance = new Mutex(true, instance, out var isFirst);
+        _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, instance + "-mostrar");
         if (!isFirst)
         {
             // Já está a correr: pede à outra instância para mostrar a janela.
