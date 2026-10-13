@@ -19,3 +19,6 @@ jobs:
 
       - name: Compilar
         run: dotnet build src/Triptico -c Release -warnaserror
+
+      - name: Testes
+        run: dotnet test tests/Triptico.Tests -c Release

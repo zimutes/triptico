@@ -19,7 +19,10 @@ public static class LayoutMath
     public static LayoutRect[] Compact(IReadOnlyList<LayoutRect> wanted, int primaryIndex)
     {
         var result = wanted.ToArray();
-        if (result.Length <= 1) return result;
+        if (result.Length == 0) return result;
+        // Um ecrã só: não há nada para arrumar, mas tem de ficar em (0,0) como qualquer principal
+        // (antes ficava onde estava no perfil, e o Windows recusava: erro 87, issue #1).
+        if (result.Length == 1) return [result[0] with { X = 0, Y = 0 }];
 
         var placed = new List<int> { primaryIndex };
 

@@ -33,4 +33,8 @@
     <Resource Include="Assets\triptico.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Triptico.Tests" />
+  </ItemGroup>
+
 </Project>

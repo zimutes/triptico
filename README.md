@@ -28,12 +28,16 @@
 >
 > **This README was written by AI** (Claude), from the source code. The app is shared as-is.
 >
-> **Tested on one desk.** It was built for the author's own three-monitor setup: one GPU,
-> two DisplayPort screens and one HDMI. Detection, profile editing, hotkeys and the tray were
-> tested there, and turning every display back on was done for real. The other kinds of
-> change were checked with Windows' own dry run (`SDC_VALIDATE`), which tells you whether
-> Windows would accept a change without making it. Other GPUs, laptops, docks and
-> daisy-chains have not been tested.
+> **What was tested.** Nothing in Tríptico is tied to one desk: it reads whatever screens
+> Windows reports (any number, any GPU, laptops, docks, portrait screens, mixed scaling) and
+> recognises each one by its device path, or by its model if the path changes. The part that
+> lays the screens out was tested automatically on thousands of random desks (1 to 16
+> screens, mixed sizes and orientations, screens turned off in the middle, the main screen
+> anywhere): it always gives a layout Windows accepts, with no overlaps and no gaps. On the
+> author's three-monitor desk (one GPU, two DisplayPort screens, one HDMI) detection, profile
+> editing, hotkeys and the tray were tested for real, and every kind of change was checked
+> with Windows' own dry run (`SDC_VALIDATE`). Other GPUs, laptops, docks and daisy-chains
+> have not been tested by hand.
 >
 > **The interface is in Portuguese** (pt-PT) for now.
 >

@@ -29,12 +29,16 @@
 > **Este LEIAME foi escrito por IA** (Claude), a partir do código. A aplicação é partilhada tal
 > como está.
 >
-> **Testado numa secretária.** Foi feita para a montagem do autor, com três monitores, uma placa
-> gráfica, dois ecrãs DisplayPort e um HDMI. A deteção, a edição de perfis, os atalhos e a bandeja
-> foram testados aí, e voltar a ligar todos os ecrãs foi feito a sério. Os outros tipos de mudança
-> foram verificados com o ensaio do próprio Windows (`SDC_VALIDATE`), que diz se o Windows
-> aceitaria a mudança sem a fazer. Outras placas, portáteis, docks e ligações em cadeia não foram
-> testados.
+> **O que foi testado.** Nada no Tríptico está preso a uma secretária: lê os ecrãs que o Windows
+> mostrar (quantos forem, qualquer placa, portáteis, docks, ecrãs ao alto, escalas diferentes) e
+> reconhece cada um pelo caminho do dispositivo ou, se este mudar, pelo modelo. A parte que dispõe
+> os ecrãs foi testada automaticamente em milhares de montagens ao acaso (de 1 a 16 ecrãs, tamanhos
+> e orientações misturados, ecrãs desligados pelo meio, o principal em qualquer sítio): dá sempre
+> uma disposição que o Windows aceita, sem sobreposições nem buracos. Na secretária do autor, com
+> três monitores (uma placa, dois ecrãs DisplayPort e um HDMI), a deteção, a edição de perfis, os
+> atalhos e a bandeja foram testados a sério, e todos os tipos de mudança foram verificados com o
+> ensaio do próprio Windows (`SDC_VALIDATE`). Outras placas, portáteis, docks e ligações em cadeia
+> não foram testados à mão.
 >
 > **Se algum ecrã ficar sem imagem:** botão direito no ícone da bandeja → *Ligar todos os ecrãs*.
 > Está lá mesmo antes de criar perfis. <kbd>Win</kbd> + <kbd>P</kbd> → *Expandir* também ajuda,
