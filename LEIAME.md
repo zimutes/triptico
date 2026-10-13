@@ -81,6 +81,12 @@ O Tríptico faz uma coisa só: **perfis de ecrãs**, um atalho para cada um.
 - **Nomes próprios** para os ecrãs («Esquerda», «Portátil»…).
 - **Linha de comandos**, para atalhos no ambiente de trabalho, Stream Deck ou scripts.
 - **Arranque com o Windows**, opcional e sem precisar de administrador.
+- **Inglês ou português.** A interface abre em inglês; para a ter em português, escolha
+  *Português* em *Language*, no fundo da janela principal.
+
+<p align="center">
+  <img src="docs/editor-pt.png" width="440" alt="Editor de perfis: uma caixa e a opção Principal por ecrã, a miniatura da disposição e o campo do atalho">
+</p>
 
 ## Funciona com qualquer combinação de monitores?
 
@@ -162,6 +168,9 @@ Triptico.exe --ligar-todos         liga todos os ecrãs ligados ao PC
 Triptico.exe --bandeja             arranca escondido na bandeja
 ```
 
+Os mesmos comandos também se escrevem em inglês: `--profile`, `--list`, `--test`, `--all-on`,
+`--tray`.
+
 Código de saída `0` é sucesso, `1` falha, `2` perfil inexistente.
 
 ## Como funciona
@@ -197,7 +206,6 @@ As GitHub Actions compilam a cada push (`compilar.yml`) e publicam uma Release a
 
 - Mudar a entrada dos monitores por **DDC/CI**, para um atalho passar a secretária toda de um PC
   para o outro sem carregar nos botões dos monitores
-- Interface em inglês
 - Versões assinadas nas Releases do GitHub
 - Resolução e frequência por perfil, opcionais
 

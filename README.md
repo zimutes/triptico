@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/janela-principal.png" width="600" alt="Tríptico main window: four profiles with a miniature of each layout, and the three connected displays">
+  <img src="docs/main-window.png" width="600" alt="Tríptico main window: four profiles with a miniature of each layout, and the three connected displays">
 </p>
 
 ---
@@ -39,10 +39,10 @@
 > with Windows' own dry run (`SDC_VALIDATE`). Other GPUs, laptops, docks and daisy-chains
 > have not been tested by hand.
 >
-> **The interface is in Portuguese** (pt-PT) for now.
+> **English or Portuguese.** The interface is in English; pick *Português* under *Language*, at
+> the bottom of the main window, to switch.
 >
-> **If a screen ever stays dark:** right-click the tray icon and pick *Ligar todos os ecrãs*
-> (turn all displays on). It's there even before you create any profile.
+> **If a screen ever stays dark:** right-click the tray icon and pick *Turn all screens on*. It's there even before you create any profile.
 > <kbd>Win</kbd> + <kbd>P</kbd> → *Extend* helps too, but it brings back the last set of
 > displays Windows remembers, which isn't always all of them. No warranty of any kind, see
 > [LICENSE](LICENSE).
@@ -150,24 +150,24 @@ again.
 
 ## Using it
 
-1. Open **Tríptico** from the Start menu. To switch a display right away, use **Ligar** /
-   **Desligar** (*on* / *off*) next to it, or **Ligar todos** (*all on*).
-2. For hotkeys, turn on the displays you use at home first, then click **Criar perfis
-   sugeridos** (*create suggested profiles*): it saves that layout as "all screens". Or arrange
-   your screens the way you like and click **Guardar disposição atual** (*save current layout*).
-3. **Editar** (*edit*) a profile to rename it, tick the displays that stay on, pick the
+1. Open **Tríptico** from the Start menu. To switch a display right away, use **Turn on** /
+   **Turn off** next to it, or **Turn all on**.
+2. For hotkeys, turn on the displays you use at home first, then click **Create suggested
+   profiles**: it saves that layout as "all screens". Or arrange
+   your screens the way you like and click **Save current layout**.
+3. **Edit** a profile to rename it, tick the displays that stay on, pick the
    primary and record a hotkey.
 4. Close the window. Tríptico stays in the tray, next to the clock, and the hotkeys keep
-   working. Tick **Iniciar com o Windows** (*start with Windows*) so it's always there.
+   working. Tick **Start with Windows** so it's always there.
 
 ## Command line
 
 ```text
-Triptico.exe --perfil "Trabalho"   apply a profile and exit
-Triptico.exe --listar              list displays and profiles
-Triptico.exe --testar "Trabalho"   ask Windows whether it would accept the profile, change nothing
-Triptico.exe --ligar-todos         turn every connected display on
-Triptico.exe --bandeja             start hidden in the tray
+Triptico.exe --profile "Work"   apply a profile and exit
+Triptico.exe --list             list displays and profiles
+Triptico.exe --test "Work"      ask Windows whether it would accept the profile, change nothing
+Triptico.exe --all-on           turn every connected display on
+Triptico.exe --tray             start hidden in the tray
 ```
 
 Exit code `0` means success, `1` failure, `2` no such profile.
@@ -195,7 +195,7 @@ folder runs alongside the installed one.
 
 ```powershell
 dotnet build src/Triptico
-dotnet run --project src/Triptico -- --listar
+dotnet run --project src/Triptico -- --list
 ```
 
 ```text
@@ -214,13 +214,12 @@ tools/
 ```
 
 **Please don't apply real profiles while testing.** It rearranges your actual screens.
-Use `--testar` together with `TRIPTICO_DADOS` pointing at a test folder.
+Use `--test` together with `TRIPTICO_DADOS` pointing at a test folder.
 
 ## Roadmap
 
 - Switch monitor inputs over **DDC/CI**, so one hotkey moves the whole desk between PCs
   without pressing buttons on the monitors
-- English interface
 - Signed builds on GitHub Releases
 - Optional resolution and refresh rate per profile
 

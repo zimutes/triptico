@@ -19,7 +19,7 @@
                 <Image Source="/Assets/triptico.ico" Width="40" Height="40" Margin="0,0,14,0" VerticalAlignment="Center" />
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Tríptico" FontSize="26" FontWeight="SemiBold" />
-                    <TextBlock Text="Os seus ecrãs, como quer, num clique." Style="{StaticResource Muted}" />
+                    <TextBlock Text="{DynamicResource L.Tagline}" Style="{StaticResource Muted}" />
                 </StackPanel>
             </DockPanel>
 
@@ -27,21 +27,16 @@
             <DockPanel Margin="0,28,0,12">
                 <Button DockPanel.Dock="Right" Click="NewFromCurrent_Click"
                         Style="{DynamicResource AccentButtonStyle}" Padding="14,6">
-                    <TextBlock><Run Text="＋" FontWeight="Bold" /> Guardar disposição atual</TextBlock>
+                    <TextBlock><Run Text="＋" FontWeight="Bold" /> <Run Text="{DynamicResource L.SaveCurrent}" /></TextBlock>
                 </Button>
-                <TextBlock Text="Perfis" Style="{StaticResource SectionTitle}" />
+                <TextBlock Text="{DynamicResource L.Profiles}" Style="{StaticResource SectionTitle}" />
             </DockPanel>
 
             <Border x:Name="EmptyState" Style="{StaticResource Card}" Padding="22" Margin="0,0,0,8">
                 <StackPanel>
-                    <TextBlock Text="Ainda não há perfis" FontSize="16" FontWeight="SemiBold" />
-                    <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,14">
-                        Um perfil guarda que ecrãs ficam ligados e onde fica cada um, para trocar com um atalho.
-                        Crie os sugeridos (todos os ecrãs + um só com cada ecrã) ou arrume os ecrãs
-                        no Windows como gosta e clique em «Guardar disposição atual».
-                        Para ligar ou desligar um ecrã já, use os botões na lista em baixo.
-                    </TextBlock>
-                    <Button Content="Criar perfis sugeridos" Click="Suggested_Click" HorizontalAlignment="Left"
+                    <TextBlock Text="{DynamicResource L.NoProfilesTitle}" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Text="{DynamicResource L.NoProfilesText}" Style="{StaticResource Muted}" Margin="0,6,0,14" />
+                    <Button Content="{DynamicResource L.CreateSuggested}" Click="Suggested_Click" HorizontalAlignment="Left"
                             Style="{DynamicResource AccentButtonStyle}" Padding="14,6" />
                 </StackPanel>
             </Border>
@@ -60,7 +55,7 @@
                                         Background="{DynamicResource SubtleFillColorSecondaryBrush}">
                                     <Grid>
                                         <v:LayoutPreview Items="{Binding Preview}" />
-                                        <TextBlock Text="Sem disposição guardada" Style="{StaticResource Muted}" FontSize="12"
+                                        <TextBlock Text="{DynamicResource L.NoLayout}" Style="{StaticResource Muted}" FontSize="12"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    Visibility="{Binding NoPreviewVisibility}" />
                                     </Grid>
@@ -70,7 +65,7 @@
                                     <Border DockPanel.Dock="Right" CornerRadius="9" Padding="8,1" VerticalAlignment="Center"
                                             Background="{DynamicResource AccentFillColorDefaultBrush}"
                                             Visibility="{Binding CurrentVisibility}">
-                                        <TextBlock Text="ativo" FontSize="11" FontWeight="SemiBold"
+                                        <TextBlock Text="{DynamicResource L.ActiveBadge}" FontSize="11" FontWeight="SemiBold"
                                                    Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
                                     </Border>
                                     <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
@@ -80,22 +75,22 @@
                                            Foreground="{Binding HotkeyBrush}" TextTrimming="CharacterEllipsis" />
 
                                 <DockPanel Margin="0,12,0,0" LastChildFill="False">
-                                    <Button Content="Aplicar" Click="Apply_Click" Tag="{Binding}" Padding="16,5"
+                                    <Button Content="{DynamicResource L.Apply}" Click="Apply_Click" Tag="{Binding}" Padding="16,5"
                                             IsEnabled="{Binding CanApply}"
                                             Style="{DynamicResource AccentButtonStyle}" />
-                                    <Button DockPanel.Dock="Right" Content="⋯" Click="More_Click" Tag="{Binding}" Padding="10,5" ToolTip="Mais opções">
+                                    <Button DockPanel.Dock="Right" Content="⋯" Click="More_Click" Tag="{Binding}" Padding="10,5" ToolTip="{DynamicResource L.MoreOptions}">
                                         <Button.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Atualizar com a disposição atual" Click="Recapture_Click" />
-                                                <MenuItem Header="Duplicar" Click="Duplicate_Click" />
-                                                <MenuItem Header="Mover para a esquerda" Click="MoveLeft_Click" />
-                                                <MenuItem Header="Mover para a direita" Click="MoveRight_Click" />
+                                                <MenuItem Header="{DynamicResource L.Recapture}" Click="Recapture_Click" />
+                                                <MenuItem Header="{DynamicResource L.Duplicate}" Click="Duplicate_Click" />
+                                                <MenuItem Header="{DynamicResource L.MoveLeft}" Click="MoveLeft_Click" />
+                                                <MenuItem Header="{DynamicResource L.MoveRight}" Click="MoveRight_Click" />
                                                 <Separator />
-                                                <MenuItem Header="Apagar" Click="Delete_Click" />
+                                                <MenuItem Header="{DynamicResource L.Delete}" Click="Delete_Click" />
                                             </ContextMenu>
                                         </Button.ContextMenu>
                                     </Button>
-                                    <Button DockPanel.Dock="Right" Content="Editar" Click="Edit_Click" Tag="{Binding}" Padding="12,5" Margin="0,0,6,0" />
+                                    <Button DockPanel.Dock="Right" Content="{DynamicResource L.Edit}" Click="Edit_Click" Tag="{Binding}" Padding="12,5" Margin="0,0,6,0" />
                                 </DockPanel>
                             </StackPanel>
                         </Border>
@@ -111,10 +106,10 @@
 
             <!-- Ecrãs -->
             <DockPanel Margin="0,20,0,12">
-                <Button DockPanel.Dock="Right" Content="Identificar ecrãs" Click="Identify_Click" Padding="14,6" />
-                <Button x:Name="EnableAllButton" DockPanel.Dock="Right" Content="Ligar todos" Click="EnableAll_Click"
+                <Button DockPanel.Dock="Right" Content="{DynamicResource L.IdentifyScreens}" Click="Identify_Click" Padding="14,6" />
+                <Button x:Name="EnableAllButton" DockPanel.Dock="Right" Content="{DynamicResource L.TurnAllOn}" Click="EnableAll_Click"
                         Padding="14,6" Margin="0,0,8,0" Style="{DynamicResource AccentButtonStyle}" />
-                <TextBlock Text="Ecrãs ligados ao PC" Style="{StaticResource SectionTitle}" />
+                <TextBlock Text="{DynamicResource L.ScreensTitle}" Style="{StaticResource SectionTitle}" />
             </DockPanel>
 
             <ItemsControl x:Name="MonitorsList">
@@ -128,16 +123,16 @@
                                     <TextBlock x:Name="BadgeText" Text="{Binding Number}" FontWeight="Bold"
                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
-                                <Button DockPanel.Dock="Right" Content="Mudar nome" Click="Rename_Click" Tag="{Binding}"
+                                <Button DockPanel.Dock="Right" Content="{DynamicResource L.Rename}" Click="Rename_Click" Tag="{Binding}"
                                         Padding="10,4" VerticalAlignment="Center" Margin="8,0,0,0" />
-                                <Button DockPanel.Dock="Right" Content="Ligar" Click="TurnOn_Click" Tag="{Binding}"
+                                <Button DockPanel.Dock="Right" Content="{DynamicResource L.TurnOn}" Click="TurnOn_Click" Tag="{Binding}"
                                         Padding="14,4" MinWidth="84" VerticalAlignment="Center" Margin="12,0,0,0"
                                         Visibility="{Binding OffVisibility}" IsEnabled="{Binding CanToggle}"
                                         Style="{DynamicResource AccentButtonStyle}" />
-                                <Button DockPanel.Dock="Right" Content="Desligar" Click="TurnOff_Click" Tag="{Binding}"
+                                <Button DockPanel.Dock="Right" Content="{DynamicResource L.TurnOff}" Click="TurnOff_Click" Tag="{Binding}"
                                         Padding="14,4" MinWidth="84" VerticalAlignment="Center" Margin="12,0,0,0"
                                         Visibility="{Binding OnVisibility}" IsEnabled="{Binding CanTurnOff}"
-                                        ToolTip="Desliga este ecrã no Windows; os outros ficam como estão." />
+                                        ToolTip="{DynamicResource L.TurnOffTip}" />
                                 <TextBlock DockPanel.Dock="Right" Text="{Binding State}" VerticalAlignment="Center"
                                            Style="{StaticResource Muted}" />
                                 <StackPanel VerticalAlignment="Center">
@@ -159,16 +154,19 @@
 
             <!-- Opções -->
             <WrapPanel Margin="0,18,0,0">
-                <CheckBox x:Name="StartupCheck" Content="Iniciar com o Windows" Margin="0,0,28,0"
+                <CheckBox x:Name="StartupCheck" Content="{DynamicResource L.StartWithWindows}" Margin="0,0,28,0"
                           Checked="Startup_Changed" Unchecked="Startup_Changed" />
-                <CheckBox x:Name="NotifyCheck" Content="Avisar quando troco de perfil"
+                <CheckBox x:Name="NotifyCheck" Content="{DynamicResource L.NotifyOnSwitch}" Margin="0,0,28,0"
                           Checked="Notify_Changed" Unchecked="Notify_Changed" />
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource L.Language}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <ComboBox x:Name="LanguageBox" MinWidth="130" SelectionChanged="Language_Changed">
+                        <ComboBoxItem Content="English" Tag="en" />
+                        <ComboBoxItem Content="Português" Tag="pt" />
+                    </ComboBox>
+                </StackPanel>
             </WrapPanel>
-            <TextBlock Style="{StaticResource Muted}" FontSize="12" Margin="0,12,0,0">
-                Se um ecrã ficar sem imagem, use «Ligar todos os ecrãs» no ícone da bandeja
-                (ou <Run FontWeight="SemiBold" Text="Win + P" /> → «Expandir»).
-                Fechar esta janela deixa o Tríptico na bandeja, ao pé do relógio.
-            </TextBlock>
+            <TextBlock Style="{StaticResource Muted}" FontSize="12" Margin="0,12,0,0"><Run Text="{DynamicResource L.HintBefore}" /><Run FontWeight="SemiBold" Text="Win + P" /><Run Text="{DynamicResource L.HintAfter}" /></TextBlock>
         </StackPanel>
     </ScrollViewer>
 </Window>

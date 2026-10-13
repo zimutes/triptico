@@ -9,9 +9,9 @@ public static class PromptWindow
     public static string? Ask(Window owner, string title, string message, string initial)
     {
         var box = new TextBox { Text = initial, Margin = new Thickness(0, 12, 0, 0) };
-        var ok = new Button { Content = "Guardar", IsDefault = true, MinWidth = 96, Margin = new Thickness(8, 0, 0, 0) };
+        var ok = new Button { Content = Loc.T("Save"), IsDefault = true, MinWidth = 96, Margin = new Thickness(8, 0, 0, 0) };
         ok.SetResourceReference(FrameworkElement.StyleProperty, "AccentButtonStyle");
-        var cancel = new Button { Content = "Cancelar", IsCancel = true, MinWidth = 96 };
+        var cancel = new Button { Content = Loc.T("Cancel"), IsCancel = true, MinWidth = 96 };
 
         var window = new Window
         {

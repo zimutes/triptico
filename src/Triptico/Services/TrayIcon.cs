@@ -45,7 +45,7 @@ internal sealed class TrayIcon : IDisposable
         var current = _app.CurrentProfile;
 
         if (_app.Settings.Profiles.Count == 0)
-            _menu.Items.Add(new WinForms.ToolStripMenuItem("Ainda não há perfis") { Enabled = false });
+            _menu.Items.Add(new WinForms.ToolStripMenuItem(Loc.T("NoProfilesTitle")) { Enabled = false });
 
         foreach (var profile in _app.Settings.Profiles)
         {
@@ -62,13 +62,13 @@ internal sealed class TrayIcon : IDisposable
 
         _menu.Items.Add(new WinForms.ToolStripSeparator());
         // Sempre presente, mesmo sem perfis: é a saída de emergência.
-        var all = new WinForms.ToolStripMenuItem("Ligar todos os ecrãs") { Enabled = _app.AnyMonitorOff && !_app.IsApplying };
+        var all = new WinForms.ToolStripMenuItem(Loc.T("TurnAllScreensOn")) { Enabled = _app.AnyMonitorOff && !_app.IsApplying };
         all.Click += (_, _) => _ = _app.EnableAllAsync();
         _menu.Items.Add(all);
-        _menu.Items.Add("Abrir o Tríptico", null, (_, _) => _app.ShowMain());
-        _menu.Items.Add("Identificar ecrãs", null, (_, _) => IdentifyOverlay.ShowAll());
+        _menu.Items.Add(Loc.T("OpenApp"), null, (_, _) => _app.ShowMain());
+        _menu.Items.Add(Loc.T("IdentifyScreens"), null, (_, _) => IdentifyOverlay.ShowAll());
         _menu.Items.Add(new WinForms.ToolStripSeparator());
-        _menu.Items.Add("Sair", null, (_, _) => _app.Quit());
+        _menu.Items.Add(Loc.T("Quit"), null, (_, _) => _app.Quit());
     }
 
     private void UpdateTooltip()

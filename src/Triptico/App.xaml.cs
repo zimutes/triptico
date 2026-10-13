@@ -59,6 +59,7 @@ public partial class App : Application
         ThreadPool.RegisterWaitForSingleObject(_showSignal, (_, _) => Dispatcher.BeginInvoke(ShowMain), null, -1, false);
 
         Settings = SettingsStore.Load();
+        Loc.Apply(Settings.Language);
         StartupRegistration.RefreshPath();
         RefreshMonitors(save: true);
 
@@ -74,7 +75,7 @@ public partial class App : Application
         };
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
 
-        if (!e.Args.Contains("--bandeja", StringComparer.OrdinalIgnoreCase))
+        if (!e.Args.Any(a => a.Equals("--tray", StringComparison.OrdinalIgnoreCase) || a.Equals("--bandeja", StringComparison.OrdinalIgnoreCase)))
             ShowMain();
     }
 
@@ -109,7 +110,7 @@ public partial class App : Application
         if (Settings.TrayHintShown) return;
         Settings.TrayHintShown = true;
         Save();
-        _tray?.Notify("O Tríptico continua aqui", "Está na bandeja, ao pé do relógio. Os atalhos continuam a funcionar.");
+        _tray?.Notify(Loc.T("StillHereTitle"), Loc.T("StillHereText"));
     }
 
     public void Quit()
@@ -197,6 +198,13 @@ public partial class App : Application
         Save();
     }
 
+    public void SetLanguage(string code)
+    {
+        Settings.Language = Loc.Normalize(code);
+        Save();
+        Loc.Apply(Settings.Language);
+    }
+
     // ------------------------------------------------------------ perfis
 
     public void SaveProfile(Profile profile)
@@ -226,7 +234,7 @@ public partial class App : Application
     {
         var copy = profile.Clone();
         copy.Id = Guid.NewGuid().ToString("N");
-        copy.Name = UniqueName(profile.Name + " (cópia)");
+        copy.Name = UniqueName(Loc.F("CopySuffix", profile.Name));
         copy.Hotkey = null;
         Settings.Profiles.Insert(Settings.Profiles.FindIndex(p => p.Id == profile.Id) + 1, copy);
         ProfilesChanged();
@@ -243,14 +251,14 @@ public partial class App : Application
     public Profile CaptureNewProfile(string? name = null)
     {
         RefreshMonitors();
-        return DisplayManager.Capture(name ?? UniqueName("Perfil " + (Settings.Profiles.Count + 1)), Monitors);
+        return DisplayManager.Capture(name ?? UniqueName(Loc.F("ProfileN", Settings.Profiles.Count + 1)), Monitors);
     }
 
     /// <summary>Perfis de arranque: "Todos os ecrãs" e um "Só ..." por cada ecrã.</summary>
     public void CreateSuggestedProfiles()
     {
         RefreshMonitors();
-        var all = DisplayManager.Capture(UniqueName("Todos os ecrãs"), Monitors);
+        var all = DisplayManager.Capture(UniqueName(Loc.T("AllScreens")), Monitors);
         foreach (var pm in all.Monitors) pm.Enabled = true;
         all.Hotkey = FreeHotkey(Key.F1);
         Settings.Profiles.Add(all);
@@ -258,7 +266,7 @@ public partial class App : Application
         var fKey = Key.F2;
         foreach (var m in Monitors)
         {
-            var only = DisplayManager.Capture(UniqueName("Só " + MonitorName(m)), Monitors);
+            var only = DisplayManager.Capture(UniqueName(Loc.F("OnlyScreen", MonitorName(m))), Monitors);
             foreach (var pm in only.Monitors)
             {
                 pm.Enabled = pm.Id == m.Id;
@@ -328,7 +336,7 @@ public partial class App : Application
         if (target is null || target.Enabled == on) return Task.CompletedTask;
         if (!on && profile.Monitors.Count(m => m.Enabled) <= 1)
         {
-            _tray?.Notify("Não dá para desligar", "É o único ecrã ligado.", error: true);
+            _tray?.Notify(Loc.T("CantTurnOffTitle"), Loc.T("CantTurnOffText"), error: true);
             return Task.CompletedTask;
         }
 
@@ -338,7 +346,7 @@ public partial class App : Application
             target.Primary = false;
             profile.Monitors.First(m => m.Enabled).Primary = true;
         }
-        profile.Name = $"{MonitorName(monitor)} {(on ? "ligado" : "desligado")}";
+        profile.Name = Loc.F(on ? "ScreenTurnedOn" : "ScreenTurnedOff", MonitorName(monitor));
         return ApplyProfileAsync(profile, profile.Name);
     }
 
@@ -346,7 +354,7 @@ public partial class App : Application
     public Task EnableAllAsync()
     {
         RefreshMonitors();
-        var profile = DisplayManager.Capture("Todos os ecrãs ligados", Monitors);
+        var profile = DisplayManager.Capture(Loc.T("AllScreensOn"), Monitors);
         foreach (var m in profile.Monitors) m.Enabled = true;
         return ApplyProfileAsync(profile, profile.Name);
     }
@@ -359,8 +367,8 @@ public partial class App : Application
         if (IsApplying) return;
         IsApplying = true;
         StateChanged?.Invoke();
-        var okTitle = doneTitle ?? $"«{profile.Name}» aplicado";
-        var failTitle = doneTitle is null ? $"Não deu para aplicar «{profile.Name}»" : "Não deu para mudar os ecrãs";
+        var okTitle = doneTitle ?? Loc.F("ProfileApplied", profile.Name);
+        var failTitle = doneTitle is null ? Loc.F("CouldNotApply", profile.Name) : Loc.T("CouldNotChange");
         try
         {
             var snapshot = profile.Clone();
@@ -385,7 +393,7 @@ public partial class App : Application
             Save();
 
             if (result.Missing.Count > 0)
-                _tray?.Notify(okTitle, "Não encontrei: " + string.Join(", ", result.Missing));
+                _tray?.Notify(okTitle, Loc.F("NotFound", string.Join(", ", result.Missing)));
             else if (Settings.ShowNotifications)
                 _tray?.Notify(okTitle, "");
         }
@@ -404,45 +412,53 @@ public partial class App : Application
 
 /// <summary>
 /// Linha de comandos, para atalhos no ambiente de trabalho, Stream Deck, etc.:
-///   Triptico.exe --perfil "Trabalho"   aplica e sai
-///   Triptico.exe --listar              mostra ecrãs e perfis
-///   Triptico.exe --testar "Trabalho"   pergunta ao Windows se aceitaria, sem mudar nada
-///   Triptico.exe --ligar-todos         liga todos os ecrãs ligados ao PC
+///   Triptico.exe --profile "Work"   aplica e sai                         (ou --perfil)
+///   Triptico.exe --list             mostra ecrãs e perfis                (ou --listar)
+///   Triptico.exe --test "Work"      pergunta ao Windows, sem mudar nada  (ou --testar)
+///   Triptico.exe --all-on           liga todos os ecrãs ligados ao PC    (ou --ligar-todos)
 /// </summary>
 internal static class CommandLine
 {
     public static bool TryRun(string[] args, out int exitCode)
     {
         exitCode = 0;
-        var cmd = args.FirstOrDefault()?.ToLowerInvariant();
-        if (cmd is not ("--perfil" or "--listar" or "--testar" or "--ligar-todos")) return false;
+        var cmd = args.FirstOrDefault()?.ToLowerInvariant() switch
+        {
+            "--profile" or "--perfil" => "profile",
+            "--list" or "--listar" => "list",
+            "--test" or "--testar" => "test",
+            "--all-on" or "--ligar-todos" => "all-on",
+            _ => null,
+        };
+        if (cmd is null) return false;
 
         AttachConsole(-1);
         Console.WriteLine();
         try
         {
             var settings = SettingsStore.Load();
-            if (cmd == "--listar")
+            Loc.Apply(settings.Language);
+            if (cmd == "list")
             {
                 var monitors = DisplayManager.GetMonitors();
-                Console.WriteLine("Ecrãs:");
+                Console.WriteLine(Loc.T("CliScreens"));
                 for (var i = 0; i < monitors.Count; i++)
                 {
                     var m = monitors[i];
                     Console.WriteLine($"  {i + 1}. {m.FriendlyName} [{m.Connector}] " +
-                        (m.Active ? $"{m.Width}x{m.Height} @ ({m.X},{m.Y}) {m.RefreshHz:0.#} Hz{(m.Primary ? " principal" : "")}" : "desligado"));
+                        (m.Active ? $"{m.Width}x{m.Height} @ ({m.X},{m.Y}) {m.RefreshHz:0.#} Hz{(m.Primary ? " " + Loc.T("CliMain") : "")}" : Loc.T("CliOff")));
                     Console.WriteLine($"     {m.Id}");
                 }
-                Console.WriteLine("Perfis:");
+                Console.WriteLine(Loc.T("CliProfiles"));
                 foreach (var p in settings.Profiles)
-                    Console.WriteLine($"  - {p.Name}{(p.Hotkey is null ? "" : $" ({p.Hotkey})")}{(DisplayManager.IsCurrent(p, monitors) ? "  <- atual" : "")}");
+                    Console.WriteLine($"  - {p.Name}{(p.Hotkey is null ? "" : $" ({p.Hotkey})")}{(DisplayManager.IsCurrent(p, monitors) ? "  " + Loc.T("CliCurrent") : "")}");
                 return true;
             }
 
             Profile? profile;
-            if (cmd == "--ligar-todos")
+            if (cmd == "all-on")
             {
-                profile = DisplayManager.Capture("Todos os ecrãs", DisplayManager.GetMonitors());
+                profile = DisplayManager.Capture(Loc.T("AllScreens"), DisplayManager.GetMonitors());
                 foreach (var m in profile.Monitors) m.Enabled = true;
             }
             else
@@ -452,19 +468,19 @@ internal static class CommandLine
             }
             if (profile is null)
             {
-                Console.WriteLine($"Perfil «{string.Join(' ', args.Skip(1))}» não existe.");
+                Console.WriteLine(Loc.F("CliNoProfile", string.Join(' ', args.Skip(1))));
                 exitCode = 2;
                 return true;
             }
 
             var known = settings.KnownPositionsFor(profile);
-            var result = DisplayManager.Apply(profile, id => known.TryGetValue(id, out var r) ? r : null, validateOnly: cmd == "--testar");
-            Console.WriteLine($"{profile.Name}: {result.Message}" + (result.Missing.Count > 0 ? " Em falta: " + string.Join(", ", result.Missing) : ""));
+            var result = DisplayManager.Apply(profile, id => known.TryGetValue(id, out var r) ? r : null, validateOnly: cmd == "test");
+            Console.WriteLine($"{profile.Name}: {result.Message}" + (result.Missing.Count > 0 ? Loc.F("CliMissing", string.Join(", ", result.Missing)) : ""));
             exitCode = result.Success ? 0 : 1;
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Erro: " + ex.Message);
+            Console.WriteLine(Loc.F("CliError", ex.Message));
             exitCode = 1;
         }
         return true;

@@ -120,7 +120,7 @@ public static class DisplayManager
             var wanted = profile.Monitors.Where(m => m.Enabled && map.ContainsKey(m)).ToList();
             var missing = profile.Monitors.Where(m => m.Enabled && !map.ContainsKey(m)).Select(m => m.Name).ToList();
             if (wanted.Count == 0)
-                return ApplyResult.Fail("Nenhum dos ecrãs deste perfil está ligado ao PC.");
+                return ApplyResult.Fail(Loc.T("NoneConnected"));
 
             var wantedKeys = wanted.Select(m => map[m].Key).ToHashSet();
             var activeKeys = monitors.Where(m => m.Active).Select(m => m.Key).ToHashSet();
@@ -131,18 +131,18 @@ public static class DisplayManager
                 var primaryKey = primaryPm is null ? ((long, uint)?)null : map[primaryPm].Key;
                 var (error, notDriven) = ApplyTopology(paths, modes, wantedKeys, primaryKey, validateOnly);
                 if (error != ERROR_SUCCESS)
-                    return ApplyResult.Fail($"O Windows recusou a mudança de ecrãs (erro {error}).");
+                    return ApplyResult.Fail(Loc.F("WindowsRefused", error));
                 foreach (var key in notDriven)
                     missing.Add(monitors.First(m => m.Key == key).FriendlyName);
                 if (validateOnly)
-                    return new ApplyResult(true, "Válido (topologia).", missing);
+                    return new ApplyResult(true, Loc.T("ValidScreens"), missing);
             }
 
             var layoutError = ArrangeLayout(profile, lastKnown, validateOnly);
             if (layoutError != ERROR_SUCCESS)
                 Log.Write($"Não foi possível acertar a disposição (erro {layoutError}).");
 
-            return new ApplyResult(true, validateOnly ? "Válido." : "Aplicado.", missing);
+            return new ApplyResult(true, Loc.T(validateOnly ? "Valid" : "Applied"), missing);
         }
     }
 
@@ -181,7 +181,7 @@ public static class DisplayManager
             {
                 var name = GetTargetName(t.adapterId, t.id);
                 var tech = OutputTechnologyName(name?.outputTechnology ?? t.outputTechnology);
-                var friendly = string.IsNullOrWhiteSpace(name?.monitorFriendlyDeviceName) ? "Ecrã genérico" : name!.Value.monitorFriendlyDeviceName;
+                var friendly = string.IsNullOrWhiteSpace(name?.monitorFriendlyDeviceName) ? Loc.T("GenericScreen") : name!.Value.monitorFriendlyDeviceName;
                 var path = name?.monitorDevicePath;
                 info = new MonitorInfo
                 {
@@ -426,7 +426,7 @@ public static class DisplayManager
 }
 
 public sealed class DisplayException(string api, int error)
-    : Exception($"{api} falhou (erro {error}).")
+    : Exception(Loc.F("ApiFailed", api, error))
 {
     public int Error { get; } = error;
 }

@@ -186,7 +186,7 @@ internal static class DisplayConfigNative
         15 => "Miracast",
         16 or 17 => "Virtual",
         18 => "USB-C",
-        unchecked((int)0x80000000) => "Interno",
-        _ => "Outro",
+        unchecked((int)0x80000000) => Loc.T("ConnectorInternal"),
+        _ => Loc.T("ConnectorOther"),
     };
 }

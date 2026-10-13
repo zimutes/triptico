@@ -8,7 +8,7 @@ public static class StartupRegistration
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ValueName = "Triptico";
 
-    private static string Command => $"\"{Environment.ProcessPath}\" --bandeja";
+    private static string Command => $"\"{Environment.ProcessPath}\" --tray";
 
     public static bool IsEnabled
     {

@@ -22,7 +22,7 @@ public partial class ProfileEditorWindow : Window
         InitializeComponent();
         _profile = profile;
         _hotkey = profile.Hotkey;
-        Title = isNew ? "Novo perfil" : $"Editar «{profile.Name}»";
+        Title = isNew ? Loc.T("NewProfile") : Loc.F("EditProfile", profile.Name);
         NameBox.Text = profile.Name;
         BuildRows(profile.Monitors);
         ShowHotkey();
@@ -50,11 +50,11 @@ public partial class ProfileEditorWindow : Window
             var details = new List<string>();
             if (name != live.FriendlyName) details.Add(live.FriendlyName);
             details.Add(live.Connector);
-            details.Add(live.Active ? $"{live.Width} × {live.Height}" : "desligado agora");
+            details.Add(live.Active ? $"{live.Width} × {live.Height}" : Loc.T("OffNow"));
             rows.Add(new EditorRow(pm, $"{_app.MonitorNumber(live)}. {name}", string.Join(" · ", details)));
         }
         foreach (var pm in list.Where(p => !map.ContainsKey(p)))
-            rows.Add(new EditorRow(pm, _app.MonitorName(pm), "Não está ligado ao PC agora"));
+            rows.Add(new EditorRow(pm, _app.MonitorName(pm), Loc.T("NotConnected")));
 
         foreach (var row in rows) row.PropertyChanged += Row_Changed;
         _rows = rows;
@@ -105,7 +105,7 @@ public partial class ProfileEditorWindow : Window
     {
         // Sem isto, carregar num atalho já existente aplicava esse perfil em vez de o gravar aqui.
         _app.SuspendHotkeys();
-        HotkeyBox.Text = _hotkey is null ? "Carregue nas teclas…" : _hotkey.ToString();
+        HotkeyBox.Text = _hotkey is null ? Loc.T("PressKeys") : _hotkey.ToString();
     }
 
     private void HotkeyBox_LostFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -134,13 +134,13 @@ public partial class ProfileEditorWindow : Window
         if (mods == ModifierKeys.None && key is Key.Back or Key.Delete)
         {
             _hotkey = null;
-            HotkeyBox.Text = "Carregue nas teclas…";
+            HotkeyBox.Text = Loc.T("PressKeys");
             ShowHint();
             return;
         }
         if (mods == ModifierKeys.None && key is not (>= Key.F13 and <= Key.F24))
         {
-            HotkeyHint.Text = "Use pelo menos uma tecla de controlo: Ctrl, Alt, Shift ou Win.";
+            HotkeyHint.Text = Loc.T("NeedModifier");
             return;
         }
 
@@ -157,7 +157,7 @@ public partial class ProfileEditorWindow : Window
 
     private void ShowHotkey()
     {
-        HotkeyBox.Text = _hotkey?.ToString() ?? "Clique aqui e carregue nas teclas (ex.: Ctrl + Alt + F1)";
+        HotkeyBox.Text = _hotkey?.ToString() ?? Loc.T("ClickAndPress");
         ShowHint();
     }
 
@@ -165,7 +165,7 @@ public partial class ProfileEditorWindow : Window
     {
         if (_hotkey is null)
         {
-            HotkeyHint.Text = "Opcional. Funciona em qualquer lado, mesmo com a janela fechada.";
+            HotkeyHint.Text = Loc.T("HotkeyOptional");
             return;
         }
 
@@ -175,12 +175,11 @@ public partial class ProfileEditorWindow : Window
                       && !_hotkey.Modifiers.HasFlag(ModifierKeys.Shift) && !_hotkey.Modifiers.HasFlag(ModifierKeys.Windows);
 
         if (other is not null)
-            HotkeyHint.Text = $"Este atalho é do perfil «{other.Name}»; ao guardar passa para este.";
+            HotkeyHint.Text = Loc.F("HotkeyTaken", other.Name);
         else if (ctrlAlt && isCharKey)
-            HotkeyHint.Text = "⚠ Ctrl + Alt é o mesmo que AltGr: este atalho pode impedir de escrever @, €, { … " +
-                              "Prefira Ctrl + Alt + F1…F12 ou junte o Shift.";
+            HotkeyHint.Text = Loc.T("AltGrWarning");
         else
-            HotkeyHint.Text = "Funciona em qualquer lado, mesmo com a janela fechada.";
+            HotkeyHint.Text = Loc.T("HotkeyWorks");
     }
 
     // ------------------------------------------------------------ guardar
@@ -190,19 +189,19 @@ public partial class ProfileEditorWindow : Window
         var name = NameBox.Text.Trim();
         if (name.Length == 0)
         {
-            MessageBox.Show(this, "Dê um nome ao perfil.", "Tríptico");
+            MessageBox.Show(this, Loc.T("NeedName"), "Tríptico");
             NameBox.Focus();
             return;
         }
         if (_app.Settings.Profiles.Any(p => p.Id != _profile.Id && string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase)))
         {
-            MessageBox.Show(this, $"Já existe um perfil chamado «{name}».", "Tríptico");
+            MessageBox.Show(this, Loc.F("NameExists", name), "Tríptico");
             NameBox.Focus();
             return;
         }
         if (!_rows.Any(r => r.Enabled))
         {
-            MessageBox.Show(this, "Escolha pelo menos um ecrã para ficar ligado.", "Tríptico");
+            MessageBox.Show(this, Loc.T("NeedScreen"), "Tríptico");
             return;
         }
 

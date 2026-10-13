@@ -98,5 +98,7 @@ public sealed class AppSettings
     /// <summary>Última posição conhecida de cada monitor (id → retângulo).</summary>
     public Dictionary<string, KnownRect> LastKnown { get; set; } = [];
     public bool ShowNotifications { get; set; } = true;
+    /// <summary>Língua da interface: "en" (por omissão) ou "pt".</summary>
+    public string Language { get; set; } = "en";
     public bool TrayHintShown { get; set; }
 }

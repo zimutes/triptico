@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _app.StateChanged += Refresh;
+        Loc.Changed += Refresh;
         Refresh();
     }
 
@@ -32,6 +33,7 @@ public partial class MainWindow : Window
         EnableAllButton.IsEnabled = _app.AnyMonitorOff && !_app.IsApplying;
         StartupCheck.IsChecked = StartupRegistration.IsEnabled;
         NotifyCheck.IsChecked = _app.Settings.ShowNotifications;
+        LanguageBox.SelectedIndex = Loc.Language == "pt" ? 1 : 0;
         _loading = false;
     }
 
@@ -87,8 +89,7 @@ public partial class MainWindow : Window
     private void Recapture_Click(object sender, RoutedEventArgs e)
     {
         if (ProfileOf(sender) is not { } p) return;
-        var ok = MessageBox.Show(this,
-            $"Substituir os ecrãs de «{p.Name}» pelo que está ligado agora (e pelas posições atuais)?",
+        var ok = MessageBox.Show(this, Loc.F("RecaptureConfirm", p.Name),
             "Tríptico", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (ok == MessageBoxResult.Yes) _app.RecaptureProfile(p);
     }
@@ -111,7 +112,7 @@ public partial class MainWindow : Window
     private void Delete_Click(object sender, RoutedEventArgs e)
     {
         if (ProfileOf(sender) is not { } p) return;
-        var ok = MessageBox.Show(this, $"Apagar o perfil «{p.Name}»?", "Tríptico",
+        var ok = MessageBox.Show(this, Loc.F("DeleteConfirm", p.Name), "Tríptico",
             MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
         if (ok == MessageBoxResult.Yes) _app.DeleteProfile(p);
     }
@@ -135,8 +136,8 @@ public partial class MainWindow : Window
     private void Rename_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is not MonitorRow row) return;
-        var name = PromptWindow.Ask(this, "Nome do ecrã",
-            $"Dê um nome fácil a este ecrã (ex.: «Esquerda», «Portátil»).\nModelo: {row.Monitor.FriendlyName} · {row.Monitor.Connector}",
+        var name = PromptWindow.Ask(this, Loc.T("RenameTitle"),
+            Loc.F("RenamePrompt", row.Monitor.FriendlyName, row.Monitor.Connector),
             _app.MonitorName(row.Monitor));
         if (name is not null) _app.SetAlias(row.Monitor, name);
     }
@@ -153,6 +154,11 @@ public partial class MainWindow : Window
     private void Notify_Changed(object sender, RoutedEventArgs e)
     {
         if (!_loading) _app.SetNotifications(NotifyCheck.IsChecked == true);
+    }
+
+    private void Language_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_loading && LanguageBox.SelectedItem is ComboBoxItem { Tag: string code }) _app.SetLanguage(code);
     }
 }
 
@@ -173,16 +179,16 @@ public sealed class ProfileCard(Profile profile, bool isCurrent, App app)
         {
             var on = Profile.Monitors.Where(m => m.Enabled).ToList();
             var primary = on.FirstOrDefault(m => m.Primary) ?? on.FirstOrDefault();
-            var count = on.Count == 1 ? "1 ecrã" : $"{on.Count} ecrãs";
-            return primary is null ? "Nenhum ecrã" : $"{count} · principal: {app.MonitorName(primary)}";
+            var count = on.Count == 1 ? Loc.T("OneScreen") : Loc.F("NScreens", on.Count);
+            return primary is null ? Loc.T("NoScreen") : Loc.F("SummaryMain", count, app.MonitorName(primary));
         }
     }
 
     public string HotkeyText => Profile.Hotkey is null
-        ? "Sem atalho"
+        ? Loc.T("NoHotkey")
         : app.HotkeyConflicts.Contains(Profile.Id)
-            ? $"⚠ {Profile.Hotkey} já está a ser usado"
-            : $"Atalho: {Profile.Hotkey}";
+            ? Loc.F("HotkeyInUse", Profile.Hotkey)
+            : Loc.F("HotkeyIs", Profile.Hotkey);
 
     public Brush? HotkeyBrush => app.HotkeyConflicts.Contains(Profile.Id)
         ? app.TryFindResource("SystemFillColorCautionBrush") as Brush ?? Brushes.DarkOrange
@@ -212,7 +218,7 @@ public sealed class MonitorRow(MonitorInfo monitor, App app)
         }
     }
 
-    public string State => !Monitor.Active ? "Desligado" : Monitor.Primary ? "Principal" : "Ligado";
+    public string State => Loc.T(!Monitor.Active ? "StateOff" : Monitor.Primary ? "StateMain" : "StateOn");
 
     public Visibility OnVisibility => Monitor.Active ? Visibility.Visible : Visibility.Collapsed;
     public Visibility OffVisibility => Monitor.Active ? Visibility.Collapsed : Visibility.Visible;
