@@ -26,8 +26,7 @@
 
 > ### Read this first
 >
-> **Written by AI.** This app (the code, the icon and this README) was written by AI
-> (Claude, by Anthropic, through Claude Code) at the author's request, and is shared as-is.
+> **This README was written by AI** (Claude), from the source code. The app is shared as-is.
 >
 > **Tested on one desk.** It was built for the author's own three-monitor setup: one GPU,
 > two DisplayPort screens and one HDMI. Detection, profile editing, hotkeys and the tray were

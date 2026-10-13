@@ -26,8 +26,8 @@
 
 > ### Leia isto primeiro
 >
-> **Escrito por IA.** Esta aplicação (código, ícone e este texto) foi escrita por IA
-> (Claude, da Anthropic, através do Claude Code) a pedido do autor, e é partilhada tal como está.
+> **Este LEIAME foi escrito por IA** (Claude), a partir do código. A aplicação é partilhada tal
+> como está.
 >
 > **Testado numa secretária.** Foi feita para a montagem do autor, com três monitores, uma placa
 > gráfica, dois ecrãs DisplayPort e um HDMI. A deteção, a edição de perfis, os atalhos e a bandeja
